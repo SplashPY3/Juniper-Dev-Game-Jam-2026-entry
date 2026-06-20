@@ -3,13 +3,12 @@ using UnityEngine.UI;
 
 public class CardButton : MonoBehaviour
 {
-    public CombatManager.CardColor color;
-
-    public int damage = 5;
-
-    public CombatManager combatManager;
+    [SerializeField] private Card card;
+    [SerializeField] private CombatManager combatManager;
 
     private Button button;
+
+    public Card Data => card;
 
     private void Awake()
     {
