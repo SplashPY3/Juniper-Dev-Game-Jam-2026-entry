@@ -1,5 +1,6 @@
 using UnityEngine;
 using TMPro;
+using UnityEngine.UI;
 
 public class CombatManager : MonoBehaviour
 {
@@ -17,10 +18,19 @@ public class CombatManager : MonoBehaviour
 
     [SerializeField] private SpriteRenderer wheelRenderer;
 
+    [SerializeField] private CardButton[] cards;
+
+    [SerializeField] private DeckManager deckManager;
+
+    [SerializeField] private Button drawCardButton;
+
+    private Card.CardColor spunColor;
+
     private enum CombatState
     {
         NotStarted,
         PlayerTurn,
+        PlayerTurnSpun,
         EnemyTurn,
         Won,
         Lost
@@ -31,7 +41,7 @@ public class CombatManager : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        victoryPanel.SetActive(false);
+        victoryPanel.SetActive(false); // disable the UI before starting the game
         defeatPanel.SetActive(false);
 
         EnterCombat();
@@ -40,29 +50,22 @@ public class CombatManager : MonoBehaviour
 
     void EnterCombat()
     {
-        Debug.Log("Entered combat");
         StartPlayerTurn();
     }
 
     void StartPlayerTurn()
     {
         currentState = CombatState.PlayerTurn;
-        Debug.Log("Player turn started");
+        drawCardButton.interactable = false;
+        ResetPlayableCards();
     }
 
     void StartEnemyTurn()
     {
         currentState = CombatState.EnemyTurn;
-        Debug.Log("Enemy turn started");
 
-        Invoke(nameof(EnemyAttack), 1f);
+        Invoke(nameof(EnemyAttack), 1f); // (TEMPORARY) attack after a delay to make the transitions between players smoother
     }
-
-    // ------------------------------------------------------------
-
-    [SerializeField] private CardButton[] cards;
-
-    private Card.CardColor spunColor;
 
     public void SpinWheel()
     {
@@ -73,21 +76,23 @@ public class CombatManager : MonoBehaviour
 
         alreadySpun = true;
 
-        spunColor = (Card.CardColor)Random.Range(0, 4);
+        //drawCardButton.interactable = true;
 
-        Debug.Log($"Wheel landed on {spunColor}");
+        currentState = CombatState.PlayerTurnSpun;
+
+        spunColor = (Card.CardColor)Random.Range(0, 4);
 
         UpdatePlayableCards();
 
     }
     private void UpdatePlayableCards()
     {
-        wheelRenderer.color = GetColor(spunColor);
+        wheelRenderer.color = Card.GetDisplayColor(spunColor);
 
         foreach (CardButton card in cards)
         {
-            bool playable = card.Data.color == spunColor;
-            card.SetPlayable(playable);
+            bool playable = card != null && card.Data != null && card.Data.color == spunColor;
+            card?.SetPlayable(playable);
         }
     }
 
@@ -95,40 +100,55 @@ public class CombatManager : MonoBehaviour
     {
         foreach (CardButton card in cards)
         {
-            bool playable = true;
-
-            card.SetPlayable(playable);
+            card?.ShowNeutral();
         }
     }
 
-    public void PlayCard(CardButton card)
+    public void TryDrawOneCard()
     {
-        if (cardPlayed.Equals(false))
-        {
-            cardPlayed = true;
+        Debug.Log(currentState);
+        Debug.Log($"Card played? {cardPlayed}");
 
-            if (currentState != CombatState.PlayerTurn)
-                return;
+        if (currentState != CombatState.PlayerTurnSpun)
+            return;
 
-            Debug.Log($"Played {card.Data.cardName} for {card.Data.damage} damage.");
+        // Drawing requires a card to have been played first.
+        if (!cardPlayed)
+            return;
 
-            if (DamageEnemy(card.Data.damage))
-            {
-                return;
-            }
-        }
+        deckManager.DrawOneCard();
+        drawCardButton.interactable = false;
+    }
+
+    public bool PlayCard(CardButton card)
+    {
+
+        if (card == null || card.Data == null)
+            return false;
+
+        if (currentState != CombatState.PlayerTurnSpun)
+            return false;
+
+        if (cardPlayed)
+            return false;
+
+        if (card.Data.color != spunColor)
+            return false;
+
+        cardPlayed = true;
+        DamageEnemy(card.Data.damage);
+
+        drawCardButton.interactable = true;
+
+        return true;
     }
 
     void EnemyAttack()
     {
-        Debug.Log($"Enemy attacks for {enemyDamage} damage.");
-
         if (DamagePlayer(enemyDamage))
         {
             return;
         }
-
-        Debug.Log("Enemy turn ended.");
 
         StartPlayerTurn();
     }
@@ -136,7 +156,6 @@ public class CombatManager : MonoBehaviour
     private bool DamageEnemy(int damage)
     {
         enemyHP = Mathf.Max(0, enemyHP - damage);
-        Debug.Log($"Enemy HP: {enemyHP}");
         UpdateHealthUI();
 
         if (enemyHP > 0)
@@ -151,7 +170,6 @@ public class CombatManager : MonoBehaviour
     private bool DamagePlayer(int damage)
     {
         playerHP = Mathf.Max(0, playerHP - damage);
-        Debug.Log($"Player HP: {playerHP}");
         UpdateHealthUI();
 
         if (playerHP > 0)
@@ -165,14 +183,12 @@ public class CombatManager : MonoBehaviour
 
     private void WinCombat()
     {
-        Debug.Log("Enemy defeated!");
         currentState = CombatState.Won;
         ShowVictory();
     }
 
     private void LoseCombat()
     {
-        Debug.Log("You died!");
         currentState = CombatState.Lost;
         ShowDefeat();
     }
@@ -181,11 +197,11 @@ public class CombatManager : MonoBehaviour
     {
         if (currentState != CombatState.Won)
         {
-            Debug.Log("Player turn ended.");
             ResetPlayableCards();
             StartEnemyTurn();
             alreadySpun = false;
             cardPlayed = false;
+            drawCardButton.interactable = false;
         }
     }
 
@@ -204,26 +220,4 @@ public class CombatManager : MonoBehaviour
     {
         defeatPanel.SetActive(true);
     }
-
-    private Color GetColor(Card.CardColor cardColor)
-    {
-        switch (cardColor)
-        {
-            case Card.CardColor.Red:
-                return Color.red;
-
-            case Card.CardColor.Green:
-                return Color.green;
-
-            case Card.CardColor.Blue:
-                return Color.blue;
-
-            case Card.CardColor.Yellow:
-                return Color.yellow;
-
-            default:
-                return Color.white;
-        }
-    }
-
 }

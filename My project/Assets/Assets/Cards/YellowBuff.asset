@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Card
   cardName: Yellow Buff
   color: 3
-  damage: 15
+  damage: 1
   description: This card buffs you with 15 points
   sprite: {fileID: 0}
   effectType: 3

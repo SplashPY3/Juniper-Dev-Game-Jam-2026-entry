@@ -25,4 +25,25 @@ public class Card : ScriptableObject
         Block,
         Buff
     }
+
+    public static Color GetDisplayColor(CardColor color)
+    {
+        switch (color)
+        {
+            case CardColor.Red:
+                return Color.red;
+
+            case CardColor.Green:
+                return Color.green;
+
+            case CardColor.Blue:
+                return Color.blue;
+
+            case CardColor.Yellow:
+                return Color.yellow;
+
+            default:
+                return Color.white;
+        }
+    }
 }
