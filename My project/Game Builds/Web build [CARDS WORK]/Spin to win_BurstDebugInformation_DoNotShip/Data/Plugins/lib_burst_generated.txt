@@ -10,7 +10,6 @@ Library: C:\Users\wansh\Documents\GitHub\Juniper-Dev-Game-Jam-2026-entry\My proj
 --target-framework=NetFramework
 --generate-link-xml=Temp\burst.link.xml
 --temp-folder=C:\Users\wansh\Documents\GitHub\Juniper-Dev-Game-Jam-2026-entry\My project\Temp\Burst
---debug=Full
 --generate-static-linkage-methods
 --key-folder=C:/Program Files/Unity/Hub/Editor/6000.5.0f1/Editor/Data/PlaybackEngines/WebGLSupport
 --decode-folder=C:\Users\wansh\Documents\GitHub\Juniper-Dev-Game-Jam-2026-entry\My project\Library\Burst
@@ -128,7 +127,6 @@ Library: C:\Users\wansh\Documents\GitHub\Juniper-Dev-Game-Jam-2026-entry\My proj
 --target-framework=NetFramework
 --generate-link-xml=Temp\burst.link.xml
 --temp-folder=C:\Users\wansh\Documents\GitHub\Juniper-Dev-Game-Jam-2026-entry\My project\Temp\Burst
---debug=Full
 --generate-static-linkage-methods
 --key-folder=C:/Program Files/Unity/Hub/Editor/6000.5.0f1/Editor/Data/PlaybackEngines/WebGLSupport
 --decode-folder=C:\Users\wansh\Documents\GitHub\Juniper-Dev-Game-Jam-2026-entry\My project\Library\Burst
@@ -170,7 +168,6 @@ Library: C:\Users\wansh\Documents\GitHub\Juniper-Dev-Game-Jam-2026-entry\My proj
 --float-mode=Fast
 --generate-link-xml=Temp\burst.link.xml
 --temp-folder=C:\Users\wansh\Documents\GitHub\Juniper-Dev-Game-Jam-2026-entry\My project\Temp\Burst
---debug=Full
 --generate-static-linkage-methods
 --key-folder=C:/Program Files/Unity/Hub/Editor/6000.5.0f1/Editor/Data/PlaybackEngines/WebGLSupport
 --decode-folder=C:\Users\wansh\Documents\GitHub\Juniper-Dev-Game-Jam-2026-entry\My project\Library\Burst

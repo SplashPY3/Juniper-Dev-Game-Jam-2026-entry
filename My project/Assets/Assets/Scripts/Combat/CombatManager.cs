@@ -1,6 +1,7 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Collections;
 using static Card;
 
 public class CombatManager : MonoBehaviour
@@ -15,6 +16,16 @@ public class CombatManager : MonoBehaviour
 
     [SerializeField] private TMP_Text playerHealthText;
     [SerializeField] private TMP_Text enemyHealthText;
+
+    [SerializeField] private TMP_Text currentTurnText;
+
+    [SerializeField] private TMP_Text playerHealthAddedText;
+    [SerializeField] private TMP_Text playerHealthTakenText;
+    [SerializeField] private TMP_Text playerShieldAddedText;
+    [SerializeField] private TMP_Text playerBuffAddedText;
+    [SerializeField] private TMP_Text enemyHealthTakenText;
+
+    [SerializeField] private string currentTurn;
 
     [SerializeField] private GameObject victoryPanel;
     [SerializeField] private GameObject defeatPanel;
@@ -61,13 +72,14 @@ public class CombatManager : MonoBehaviour
         currentState = CombatState.PlayerTurn;
         drawCardButton.interactable = false;
         ResetPlayableCards();
+        UpdateTurnUI();
     }
 
     void StartEnemyTurn()
     {
         currentState = CombatState.EnemyTurn;
 
-        Invoke(nameof(EnemyAttack), 1f); // (TEMPORARY) attack after a delay to make the transitions between players smoother
+        Invoke(nameof(EnemyAttack), 2f); // (TEMPORARY) attack after a delay to make the transitions between players smoother
     }
 
     public void SpinWheel()
@@ -153,19 +165,27 @@ public class CombatManager : MonoBehaviour
         switch (card.effectType)
         {
             case CardEffectType.Damage:
-                DamageEnemy(card.effectValue + playerDamageBonus);
+                int damage = card.effectValue + playerDamageBonus;
+                enemyHealthTakenText.text = $"-{damage}";
+                StartCoroutine(DamageEnemyAfterDelay(damage));
+                //DamageEnemy(card.effectValue + playerDamageBonus);
                 break;
 
             case CardEffectType.Heal:
-                playerHP += card.effectValue;
+                int health = card.effectValue;
+                playerHealthAddedText.text = $"+{health}";
+                StartCoroutine(AddHealthAfterDelay(health));
+                //playerHP += card.effectValue;
                 break;
 
             case CardEffectType.Block:
                 playerBlock += card.effectValue;
+                playerShieldAddedText.text = $"+{playerBlock}";
                 break;
 
             case CardEffectType.Buff:
                 playerDamageBonus += card.effectValue;
+                playerBuffAddedText.text = $"+{playerDamageBonus}";
                 break;
         }
 
@@ -181,14 +201,22 @@ public class CombatManager : MonoBehaviour
 
         if (remainingDamage > 0)
         {
-            DamagePlayer(remainingDamage);
+            //DamagePlayer(remainingDamage);
+            playerHealthTakenText.text = $"-{remainingDamage}";
+            StartCoroutine(DamagePlayerAfterDelay(remainingDamage));
         }
 
+        playerShieldAddedText.text = "";
+
         StartPlayerTurn();
+        UpdateTurnUI();
     }
 
     private bool DamageEnemy(int damage)
     {
+        //enemyHealthTakenText.text = $"-{damage}";
+        //StartCoroutine(DamageEnemyAfterDelay(damage));
+
         enemyHP = Mathf.Max(0, enemyHP - damage);
         UpdateHealthUI();
 
@@ -201,8 +229,18 @@ public class CombatManager : MonoBehaviour
         return true;
     }
 
+    private IEnumerator DamageEnemyAfterDelay(int damage)
+    {
+        yield return new WaitForSeconds(1f);
+        DamageEnemy(damage);
+        enemyHealthTakenText.text = "";
+    }
+
     private bool DamagePlayer(int damage)
     {
+        //playerHealthTakenText.text = $"-{damage}";
+        //StartCoroutine(DamagePlayerAfterDelay(damage));
+
         playerHP = Mathf.Max(0, playerHP - damage);
         UpdateHealthUI();
 
@@ -213,6 +251,21 @@ public class CombatManager : MonoBehaviour
 
         LoseCombat();
         return true;
+    }
+
+    private IEnumerator DamagePlayerAfterDelay(int damage)
+    {
+        yield return new WaitForSeconds(1f);
+        DamagePlayer(damage);
+        playerHealthTakenText.text = "";
+    }
+
+    private IEnumerator AddHealthAfterDelay(int health)
+    {
+        yield return new WaitForSeconds(1f);
+        playerHP += health;
+        UpdateHealthUI();
+        playerHealthAddedText.text = "";
     }
 
     private void WinCombat()
@@ -233,6 +286,7 @@ public class CombatManager : MonoBehaviour
         {
             ResetPlayableCards();
             StartEnemyTurn();
+            UpdateTurnUI();
             alreadySpun = false;
             cardPlayed = false;
             drawCardButton.interactable = false;
@@ -243,6 +297,21 @@ public class CombatManager : MonoBehaviour
     {
         playerHealthText.text = playerHP.ToString();
         enemyHealthText.text = enemyHP.ToString();
+    }
+
+    void UpdateTurnUI()
+    {
+        if (currentState == CombatState.PlayerTurn)
+        {
+            currentTurn = "Player's turn";
+        }
+
+        else if (currentState == CombatState.EnemyTurn)
+        {
+            currentTurn = "Enemy's turn";
+        }
+
+        currentTurnText.text = currentTurn;
     }
 
     void ShowVictory()
