@@ -1,10 +1,12 @@
+using System;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 
 public class CombatManager : MonoBehaviour
 {
-    [SerializeField] private int playerHP = 30;
+    [SerializeField] private int playerHP    = 30;
+    [SerializeField] private int maxPlayerHP = 30;
     [SerializeField] private int enemyHP = 20;
     [SerializeField] private int enemyDamage = 5;
     [SerializeField] private bool alreadySpun = false;
@@ -26,6 +28,15 @@ public class CombatManager : MonoBehaviour
 
     private Card.CardColor spunColor;
 
+    public static CombatManager Instance { get; private set; }
+
+    // Events broadcast to the relic system
+    public static event Action<Card.CardColor> OnSpin;
+    public static event Action<int>            OnDamageDealt;
+    public static event Action<int>            OnDamageTaken;
+    public static event Action                 OnEnemyKilled;
+    public static event Action                 OnPlayerTurnStart;
+
     private enum CombatState
     {
         NotStarted,
@@ -37,6 +48,11 @@ public class CombatManager : MonoBehaviour
     }
 
     private CombatState currentState = CombatState.NotStarted;
+
+    private void Awake()
+    {
+        Instance = this;
+    }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -58,6 +74,7 @@ public class CombatManager : MonoBehaviour
         currentState = CombatState.PlayerTurn;
         drawCardButton.interactable = false;
         ResetPlayableCards();
+        OnPlayerTurnStart?.Invoke();
     }
 
     void StartEnemyTurn()
@@ -82,6 +99,7 @@ public class CombatManager : MonoBehaviour
 
         spunColor = (Card.CardColor)Random.Range(0, 4);
 
+        OnSpin?.Invoke(spunColor);
         UpdatePlayableCards();
 
     }
@@ -136,7 +154,11 @@ public class CombatManager : MonoBehaviour
             return false;
 
         cardPlayed = true;
-        DamageEnemy(card.Data.damage);
+
+        int bonusDamage  = RelicManager.Instance != null ? RelicManager.Instance.GetBonusDamage() : 0;
+        int totalDamage  = card.Data.damage + bonusDamage;
+        DamageEnemy(totalDamage);
+        OnDamageDealt?.Invoke(totalDamage);
 
         drawCardButton.interactable = true;
 
@@ -174,6 +196,7 @@ public class CombatManager : MonoBehaviour
 
         if (playerHP > 0)
         {
+            OnDamageTaken?.Invoke(damage); // only fire if the player survived the hit
             return false;
         }
 
@@ -184,6 +207,7 @@ public class CombatManager : MonoBehaviour
     private void WinCombat()
     {
         currentState = CombatState.Won;
+        OnEnemyKilled?.Invoke();
         ShowVictory();
     }
 
@@ -219,5 +243,18 @@ public class CombatManager : MonoBehaviour
     void ShowDefeat()
     {
         defeatPanel.SetActive(true);
+    }
+
+    public void HealPlayer(int amount)
+    {
+        playerHP = Mathf.Min(playerHP + amount, maxPlayerHP);
+        UpdateHealthUI();
+    }
+
+    public void GainMaxHP(int amount)
+    {
+        maxPlayerHP += amount;
+        playerHP    += amount;
+        UpdateHealthUI();
     }
 }
