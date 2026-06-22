@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Card
   cardName: Red Strike
   color: 0
-  damage: 5
+  effectValue: 5
   description: This card damages the enemy
-  sprite: {fileID: 0}
+  sprite: {fileID: -3753825769889500098, guid: b36601d7e4b644747a50f6c2c560de8c, type: 3}
   effectType: 0

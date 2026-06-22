@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Card
   cardName: Blue Shield
   color: 2
-  damage: 0
+  effectValue: 5
   description: It blocks up to 10 damage
-  sprite: {fileID: 0}
+  sprite: {fileID: 3999373412554968695, guid: 66bc59b52c77fb049ba48701f5f22c2c, type: 3}
   effectType: 2

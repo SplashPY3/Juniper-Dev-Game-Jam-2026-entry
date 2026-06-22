@@ -16,8 +16,15 @@ public class DeckManager : MonoBehaviour
 
     public IReadOnlyList<Card> Hand => hand;
 
+    private readonly HandSelectionManager selectionManager = new();
+
     void Awake()
     {
+        foreach (CardButton slot in handSlots)
+        {
+            slot?.SetSelectionManager(selectionManager);
+        }
+
         InitializeDeck();
     }
 
@@ -108,6 +115,11 @@ public class DeckManager : MonoBehaviour
             discardPile.Add(card);
             slot.ClearCard();
         }
+    }
+
+    public void ClearSelection()
+    {
+        selectionManager.ClearSelection();
     }
 
     private void ReshuffleDiscardPile()

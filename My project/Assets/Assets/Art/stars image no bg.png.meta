@@ -1,13 +1,10 @@
 fileFormatVersion: 2
-guid: e096dbdefb1ce0145a976d00ec144c19
+guid: 66bc59b52c77fb049ba48701f5f22c2c
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -498280781719768741
-    second: fire no bg_0
-  - first:
-      213: -1876617945140417383
-    second: fire no bg_1
+      213: 3999373412554968695
+    second: stars image no bg_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -54,7 +51,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 16
+  spritePixelsToUnits: 100
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -116,13 +113,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: fire no bg_0
+      name: stars image no bg_0
       rect:
         serializedVersion: 2
-        x: 11
+        x: 59
         y: 0
-        width: 1502
-        height: 1024
+        width: 234
+        height: 320
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -131,30 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: b51703fd440c519f0800000000000000
-      internalID: -498280781719768741
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: fire no bg_1
-      rect:
-        serializedVersion: 2
-        x: 701
-        y: 95
-        width: 7
-        height: 6
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 99c28c0fbe9e4f5e0800000000000000
-      internalID: -1876617945140417383
+      spriteID: 77e0b7bdde0a08730800000000000000
+      internalID: 3999373412554968695
       vertices: []
       indices: 
       edges: []
@@ -173,8 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      fire no bg_0: -498280781719768741
-      fire no bg_1: -1876617945140417383
+      stars image no bg_0: 3999373412554968695
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

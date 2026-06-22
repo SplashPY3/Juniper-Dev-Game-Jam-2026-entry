@@ -5,7 +5,7 @@ public class Card : ScriptableObject
 {
     public string cardName;
     public CardColor color;
-    public int damage;
+    public int effectValue;
     public string description;
     public Sprite sprite;
     public CardEffectType effectType;

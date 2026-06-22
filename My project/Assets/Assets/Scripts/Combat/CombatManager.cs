@@ -1,10 +1,13 @@
-using UnityEngine;
 using TMPro;
+using UnityEngine;
 using UnityEngine.UI;
+using static Card;
 
 public class CombatManager : MonoBehaviour
 {
     [SerializeField] private int playerHP = 30;
+    [SerializeField] private int playerBlock = 5;
+    [SerializeField] private int playerDamageBonus = 0;
     [SerializeField] private int enemyHP = 20;
     [SerializeField] private int enemyDamage = 5;
     [SerializeField] private bool alreadySpun = false;
@@ -76,8 +79,6 @@ public class CombatManager : MonoBehaviour
 
         alreadySpun = true;
 
-        //drawCardButton.interactable = true;
-
         currentState = CombatState.PlayerTurnSpun;
 
         spunColor = (Card.CardColor)Random.Range(0, 4);
@@ -98,6 +99,8 @@ public class CombatManager : MonoBehaviour
 
     void ResetPlayableCards()
     {
+        deckManager.ClearSelection();
+
         foreach (CardButton card in cards)
         {
             card?.ShowNeutral();
@@ -106,9 +109,6 @@ public class CombatManager : MonoBehaviour
 
     public void TryDrawOneCard()
     {
-        Debug.Log(currentState);
-        Debug.Log($"Card played? {cardPlayed}");
-
         if (currentState != CombatState.PlayerTurnSpun)
             return;
 
@@ -122,7 +122,6 @@ public class CombatManager : MonoBehaviour
 
     public bool PlayCard(CardButton card)
     {
-
         if (card == null || card.Data == null)
             return false;
 
@@ -136,18 +135,53 @@ public class CombatManager : MonoBehaviour
             return false;
 
         cardPlayed = true;
-        DamageEnemy(card.Data.damage);
 
-        drawCardButton.interactable = true;
+        ResolveCard(card.Data);
+
+        deckManager.DiscardFromHand(card);
+
+        deckManager.ClearSelection();
+
+        drawCardButton.interactable =
+        currentState == CombatState.PlayerTurnSpun;
 
         return true;
     }
 
+    private void ResolveCard(Card card)
+    {
+        switch (card.effectType)
+        {
+            case CardEffectType.Damage:
+                DamageEnemy(card.effectValue + playerDamageBonus);
+                break;
+
+            case CardEffectType.Heal:
+                playerHP += card.effectValue;
+                break;
+
+            case CardEffectType.Block:
+                playerBlock += card.effectValue;
+                break;
+
+            case CardEffectType.Buff:
+                playerDamageBonus += card.effectValue;
+                break;
+        }
+
+        UpdateHealthUI();
+    }
+
     void EnemyAttack()
     {
-        if (DamagePlayer(enemyDamage))
+        int blockedDamage = Mathf.Min(playerBlock, enemyDamage);
+        playerBlock -= blockedDamage;
+
+        int remainingDamage = enemyDamage - blockedDamage;
+
+        if (remainingDamage > 0)
         {
-            return;
+            DamagePlayer(remainingDamage);
         }
 
         StartPlayerTurn();

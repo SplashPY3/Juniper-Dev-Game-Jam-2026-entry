@@ -8,7 +8,10 @@ public class CardButton : MonoBehaviour
     [SerializeField] private DeckManager deckManager;
     [SerializeField] private Image cardImage;
 
+    [SerializeField] private GameObject playCardButton;
+
     private Button button;
+    private HandSelectionManager selectionManager;
 
     public Card Data => card;
 
@@ -18,6 +21,11 @@ public class CardButton : MonoBehaviour
         button.transition = Selectable.Transition.None;
     }
 
+    private void Start()
+    {
+        SetSelected(false);
+    }
+
     public void SetPlayable(bool playable)
     {
         button.interactable = playable && card != null;
@@ -25,11 +33,9 @@ public class CardButton : MonoBehaviour
         if (card == null)
             return;
 
-        Color originalColor = Card.GetDisplayColor(card.color);
-
         cardImage.color = playable
-            ? originalColor
-            : Color.Lerp(originalColor, Color.gray, 0.65f);
+            ? Color.white
+            : Color.gray;
     }
 
     public void SetCard(Card newCard)
@@ -55,7 +61,7 @@ public class CardButton : MonoBehaviour
 
         if (card != null)
         {
-            cardImage.color = Card.GetDisplayColor(card.color);
+            cardImage.color = Color.white;
         }
     }
 
@@ -64,9 +70,26 @@ public class CardButton : MonoBehaviour
         SetCard(null);
     }
 
+    public void SetSelectionManager(HandSelectionManager manager)
+    {
+        selectionManager = manager;
+    }
+
+    public void SelectCard()
+    {
+        if (card != null)
+        {
+            selectionManager?.SelectCard(this);
+        }
+    }
+
+    public void SetSelected(bool selected)
+    {
+        playCardButton.SetActive(selected && card != null);
+    }
+
     public void PlayCard()
     {
-        if (combatManager.PlayCard(this))
-            deckManager.DiscardFromHand(this);
+        combatManager.PlayCard(this);
     }
 }

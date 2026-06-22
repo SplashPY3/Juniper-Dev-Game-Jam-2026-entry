@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Card
   cardName: Green Heal
   color: 1
-  damage: 0
+  effectValue: 5
   description: This card heals you
-  sprite: {fileID: 0}
+  sprite: {fileID: 9210035820783190459, guid: fef1ef01b869c62499df2cc1adc7c351, type: 3}
   effectType: 1
