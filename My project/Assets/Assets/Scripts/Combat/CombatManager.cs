@@ -6,15 +6,20 @@ using static Card;
 
 public class CombatManager : MonoBehaviour
 {
+    [SerializeField] private int playerMaxHP = 30;
     [SerializeField] private int playerHP = 30;
-    [SerializeField] private int playerBlock = 5;
+    [SerializeField] private int playerBlock = 0;
     [SerializeField] private int playerDamageBonus = 0;
-    [SerializeField] private int enemyHP = 20;
-    [SerializeField] private int enemyDamage = 5;
+    [SerializeField] private int playerGold = 0;
     [SerializeField] private bool alreadySpun = false;
     [SerializeField] private bool cardPlayed = false;
 
+    private bool playerHealedThisTurn;
+
     [SerializeField] private TMP_Text playerHealthText;
+
+    [SerializeField] private TMP_Text goldAddedText;
+    [SerializeField] private TMP_Text currentGoldText;
     [SerializeField] private TMP_Text enemyHealthText;
 
     [SerializeField] private TMP_Text currentTurnText;
@@ -23,7 +28,11 @@ public class CombatManager : MonoBehaviour
     [SerializeField] private TMP_Text playerHealthTakenText;
     [SerializeField] private TMP_Text playerShieldAddedText;
     [SerializeField] private TMP_Text playerBuffAddedText;
+
+    [SerializeField] private TMP_Text enemyHealthAddedText;
     [SerializeField] private TMP_Text enemyHealthTakenText;
+    [SerializeField] private TMP_Text enemyShieldAddedText;
+    [SerializeField] private TMP_Text enemyBuffAddedText;
 
     [SerializeField] private string currentTurn;
 
@@ -37,6 +46,8 @@ public class CombatManager : MonoBehaviour
     [SerializeField] private DeckManager deckManager;
 
     [SerializeField] private Button drawCardButton;
+
+    [SerializeField] private EnemyController enemyController;
 
     private Card.CardColor spunColor;
 
@@ -79,7 +90,7 @@ public class CombatManager : MonoBehaviour
     {
         currentState = CombatState.EnemyTurn;
 
-        Invoke(nameof(EnemyAttack), 2f); // (TEMPORARY) attack after a delay to make the transitions between players smoother
+        StartCoroutine(EnemyTurnAfterDelay());
     }
 
     public void SpinWheel()
@@ -168,14 +179,13 @@ public class CombatManager : MonoBehaviour
                 int damage = card.effectValue + playerDamageBonus;
                 enemyHealthTakenText.text = $"-{damage}";
                 StartCoroutine(DamageEnemyAfterDelay(damage));
-                //DamageEnemy(card.effectValue + playerDamageBonus);
                 break;
 
             case CardEffectType.Heal:
                 int health = card.effectValue;
+                playerHealedThisTurn = true;
                 playerHealthAddedText.text = $"+{health}";
                 StartCoroutine(AddHealthAfterDelay(health));
-                //playerHP += card.effectValue;
                 break;
 
             case CardEffectType.Block:
@@ -192,41 +202,140 @@ public class CombatManager : MonoBehaviour
         UpdateHealthUI();
     }
 
-    void EnemyAttack()
+    private IEnumerator EnemyTurnAfterDelay()
     {
-        int blockedDamage = Mathf.Min(playerBlock, enemyDamage);
-        playerBlock -= blockedDamage;
+        yield return new WaitForSeconds(2f);
 
-        int remainingDamage = enemyDamage - blockedDamage;
+        EnemyAction action = enemyController.GetNextAction(
+            playerHP,
+            playerMaxHP,
+            playerBlock,
+            playerDamageBonus,
+            playerHealedThisTurn);
+
+        playerHealedThisTurn = false;
+
+        if (action != null)
+        {
+            yield return ResolveEnemyAction(action);
+        }
+
+        UpdateHealthUI();
+
+        if (currentState == CombatState.EnemyTurn)
+        {
+            StartPlayerTurn();
+        }
+    }
+
+    private IEnumerator ResolveEnemyAction(EnemyAction action)
+    {
+        switch (action.intentType)
+        {
+            case EnemyAction.IntentType.Attack:
+                yield return ResolveEnemyAttack(action.value);
+                break;
+
+            case EnemyAction.IntentType.Block:
+                yield return ResolveEnemyBlock(action.value);
+                break;
+
+            case EnemyAction.IntentType.Heal:
+                yield return ResolveEnemyHeal(action.value);
+                break;
+
+            case EnemyAction.IntentType.Buff:
+                yield return ResolveEnemyBuff();
+                break;
+
+            case EnemyAction.IntentType.Debuff:
+                yield return ResolveEnemyDebuff();
+                break;
+
+            default:
+                Debug.LogWarning($"Unsupported enemy intent: {action.intentType}");
+                break;
+        }
+    }
+
+    private IEnumerator ResolveEnemyAttack(int baseDamage)
+    {
+        int totalDamage = baseDamage * enemyController.AttackMultiplier;
+        int blockedDamage = Mathf.Min(playerBlock, totalDamage);
+        int remainingDamage = totalDamage - blockedDamage;
+
+        if (remainingDamage > 0)
+            playerHealthTakenText.text = $"-{remainingDamage}";
+
+        yield return new WaitForSeconds(1f);
+
+        // Any incoming attack consumes the player's entire block stack.
+        playerBlock = 0;
 
         if (remainingDamage > 0)
         {
-            //DamagePlayer(remainingDamage);
-            playerHealthTakenText.text = $"-{remainingDamage}";
-            StartCoroutine(DamagePlayerAfterDelay(remainingDamage));
+            DamagePlayer(remainingDamage);
         }
 
+        playerHealthTakenText.text = "";
         playerShieldAddedText.text = "";
+    }
 
-        StartPlayerTurn();
-        UpdateTurnUI();
+    private IEnumerator ResolveEnemyBlock(int amount)
+    {
+        enemyShieldAddedText.text = $"+{amount} Block";
+        yield return new WaitForSeconds(1f);
+
+        enemyController.AddBlock(amount);
+        enemyShieldAddedText.text = $"+{enemyController.Block}";
+    }
+
+    private IEnumerator ResolveEnemyHeal(int amount)
+    {
+        enemyHealthAddedText.text = $"+{amount}";
+        yield return new WaitForSeconds(1f);
+
+        enemyController.Heal(amount);
+        enemyHealthAddedText.text = "";
+    }
+
+    private IEnumerator ResolveEnemyBuff()
+    {
+        enemyBuffAddedText.text = "x2";
+        yield return new WaitForSeconds(1f);
+
+        enemyController.DoubleAttackDamage();
+        enemyBuffAddedText.text = "";
+    }
+
+    private IEnumerator ResolveEnemyDebuff()
+    {
+        int previousBonus = playerDamageBonus;
+        int reducedBonus = previousBonus / 2;
+        int removedBonus = previousBonus - reducedBonus;
+
+        playerBuffAddedText.text = $"-{removedBonus} Buff";
+        yield return new WaitForSeconds(1f);
+
+        playerDamageBonus = reducedBonus;
+        playerBuffAddedText.text = playerDamageBonus > 0
+            ? $"+{playerDamageBonus}"
+            : "";
     }
 
     private bool DamageEnemy(int damage)
     {
-        //enemyHealthTakenText.text = $"-{damage}";
-        //StartCoroutine(DamageEnemyAfterDelay(damage));
-
-        enemyHP = Mathf.Max(0, enemyHP - damage);
+        enemyController.TakeDamage(damage);
+        enemyShieldAddedText.text = "";
         UpdateHealthUI();
 
-        if (enemyHP > 0)
+        if (enemyController.isDead())
         {
-            return false;
+            WinCombat();
+            return true;
         }
 
-        WinCombat();
-        return true;
+        return false;
     }
 
     private IEnumerator DamageEnemyAfterDelay(int damage)
@@ -238,9 +347,6 @@ public class CombatManager : MonoBehaviour
 
     private bool DamagePlayer(int damage)
     {
-        //playerHealthTakenText.text = $"-{damage}";
-        //StartCoroutine(DamagePlayerAfterDelay(damage));
-
         playerHP = Mathf.Max(0, playerHP - damage);
         UpdateHealthUI();
 
@@ -253,17 +359,10 @@ public class CombatManager : MonoBehaviour
         return true;
     }
 
-    private IEnumerator DamagePlayerAfterDelay(int damage)
-    {
-        yield return new WaitForSeconds(1f);
-        DamagePlayer(damage);
-        playerHealthTakenText.text = "";
-    }
-
     private IEnumerator AddHealthAfterDelay(int health)
     {
         yield return new WaitForSeconds(1f);
-        playerHP += health;
+        playerHP = Mathf.Min(playerMaxHP, playerHP + health);
         UpdateHealthUI();
         playerHealthAddedText.text = "";
     }
@@ -271,6 +370,8 @@ public class CombatManager : MonoBehaviour
     private void WinCombat()
     {
         currentState = CombatState.Won;
+        goldAddedText.text = $"+{enemyController.GoldReward} gold";
+        currentGoldText.text = $"Current gold: {playerGold + enemyController.GoldReward}";
         ShowVictory();
     }
 
@@ -296,7 +397,7 @@ public class CombatManager : MonoBehaviour
     private void UpdateHealthUI()
     {
         playerHealthText.text = playerHP.ToString();
-        enemyHealthText.text = enemyHP.ToString();
+        enemyHealthText.text = enemyController.CurrentHP.ToString();
     }
 
     void UpdateTurnUI()
