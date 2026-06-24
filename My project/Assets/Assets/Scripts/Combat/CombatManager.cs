@@ -1,7 +1,8 @@
+using System.Collections;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using System.Collections;
 using static Card;
 
 public class CombatManager : MonoBehaviour
@@ -10,7 +11,7 @@ public class CombatManager : MonoBehaviour
     [SerializeField] private int playerHP = 30;
     [SerializeField] private int playerBlock = 0;
     [SerializeField] private int playerDamageBonus = 0;
-    [SerializeField] private int playerGold = 0;
+    //[SerializeField] private int playerGold = 0;
     [SerializeField] private bool alreadySpun = false;
     [SerializeField] private bool cardPlayed = false;
 
@@ -48,6 +49,8 @@ public class CombatManager : MonoBehaviour
     [SerializeField] private Button drawCardButton;
 
     [SerializeField] private EnemyController enemyController;
+
+    [SerializeField] private PlayerManager playerManager;
 
     private Card.CardColor spunColor;
 
@@ -205,6 +208,11 @@ public class CombatManager : MonoBehaviour
     private IEnumerator EnemyTurnAfterDelay()
     {
         yield return new WaitForSeconds(2f);
+
+        if (currentState != CombatState.EnemyTurn || enemyController.isDead())
+        {
+            yield break;
+        }
 
         EnemyAction action = enemyController.GetNextAction(
             playerHP,
@@ -370,9 +378,16 @@ public class CombatManager : MonoBehaviour
     private void WinCombat()
     {
         currentState = CombatState.Won;
-        goldAddedText.text = $"+{enemyController.GoldReward} gold";
-        currentGoldText.text = $"Current gold: {playerGold + enemyController.GoldReward}";
+        RewardPlayer();
         ShowVictory();
+    }
+
+    private void RewardPlayer()
+    {
+        //playerGold += enemyController.GoldReward;
+        goldAddedText.text = $"+{enemyController.GoldReward} gold";
+        playerManager.AddGold(enemyController.GoldReward);
+        currentGoldText.text = $"Current gold: {playerManager.Gold}";
     }
 
     private void LoseCombat()
@@ -383,15 +398,18 @@ public class CombatManager : MonoBehaviour
 
     public void EndPlayerTurn()
     {
-        if (currentState != CombatState.Won)
+
+        if (currentState != CombatState.PlayerTurnSpun)
         {
-            ResetPlayableCards();
-            StartEnemyTurn();
-            UpdateTurnUI();
-            alreadySpun = false;
-            cardPlayed = false;
-            drawCardButton.interactable = false;
+            return;
         }
+
+        ResetPlayableCards();
+        StartEnemyTurn();
+        UpdateTurnUI();
+        alreadySpun = false;
+        cardPlayed = false;
+        drawCardButton.interactable = false;
     }
 
     private void UpdateHealthUI()
@@ -415,9 +433,17 @@ public class CombatManager : MonoBehaviour
         currentTurnText.text = currentTurn;
     }
 
+    IEnumerator LoadShopAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(3f);
+
+        SceneManager.LoadScene("Shop");
+    }
+
     void ShowVictory()
     {
         victoryPanel.SetActive(true);
+        StartCoroutine(LoadShopAfterDelay(3f));
     }
 
     void ShowDefeat()

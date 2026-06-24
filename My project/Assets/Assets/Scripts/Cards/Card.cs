@@ -9,6 +9,7 @@ public class Card : ScriptableObject
     public string description;
     public Sprite sprite;
     public CardEffectType effectType;
+    public int cardPrice;
 
     public enum CardColor
     {

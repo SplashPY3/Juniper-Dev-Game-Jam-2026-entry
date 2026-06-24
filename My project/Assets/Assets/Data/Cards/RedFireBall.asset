@@ -18,3 +18,4 @@ MonoBehaviour:
   description: This card sets the enemy ablaze
   sprite: {fileID: 6682239313113947837, guid: 7b1cee321bdb4674d926d0fb3fa66901, type: 3}
   effectType: 0
+  cardPrice: 7

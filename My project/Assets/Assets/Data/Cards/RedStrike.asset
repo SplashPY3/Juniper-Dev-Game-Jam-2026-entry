@@ -16,5 +16,6 @@ MonoBehaviour:
   color: 0
   effectValue: 5
   description: This card damages the enemy
-  sprite: {fileID: -3753825769889500098, guid: b36601d7e4b644747a50f6c2c560de8c, type: 3}
+  sprite: {fileID: -8911045015832400989, guid: 94e997ea439991c48a3f7baec6ca607a, type: 3}
   effectType: 0
+  cardPrice: 5

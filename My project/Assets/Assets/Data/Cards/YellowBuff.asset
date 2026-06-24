@@ -18,3 +18,4 @@ MonoBehaviour:
   description: This card buffs you with 15 points
   sprite: {fileID: 999996611833419815, guid: 794187ad4b9a1e549ab7d6597446c2f6, type: 3}
   effectType: 3
+  cardPrice: 5

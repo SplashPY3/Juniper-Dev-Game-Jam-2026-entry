@@ -1,0 +1,48 @@
+using System.Collections.Generic;
+using UnityEngine;
+
+public class PlayerManager : MonoBehaviour
+{
+    public static PlayerManager Instance { get; private set; }
+
+    public int Gold { get; private set; }
+
+    public List<Card> playerDeck = new();
+
+    private void Awake()
+    {
+        if (Instance != null)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+    }
+
+    public void AddGold(int amount)
+    {
+        Gold += amount;
+        Debug.Log($"Gold: {Gold}");
+    }
+
+    public bool CanAfford(int amount)
+    {
+        return Gold >= amount;
+    }
+
+    public bool SpendGold(int amount)
+    {
+        if (!CanAfford(amount))
+            return false;
+
+        Gold -= amount;
+        return true;
+    }
+
+    public void AddCardToDeck(Card card)
+    {
+        playerDeck.Add(card);
+    }
+}

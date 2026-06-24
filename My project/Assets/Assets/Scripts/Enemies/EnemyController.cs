@@ -29,30 +29,6 @@ public class EnemyController : MonoBehaviour
         AttackMultiplier = 1;
         actionIndex = 0;
     }
-
-    //public EnemyAction GetNextAction()
-    //{
-    //    if (enemyData.Actions == null || enemyData.Actions.Count == 0)
-    //    {
-    //        Debug.LogWarning($"{enemyData.enemyName} has no configured actions.");
-    //        return null;
-    //    }
-
-    //    if (enemyData.actionSelectionMode == Enemy.ActionSelectionMode.Random)
-    //    {
-    //        return enemyData.Actions[Random.Range(0, enemyData.Actions.Count)];
-    //    }
-
-    //    EnemyAction action = enemyData.Actions[actionIndex];
-
-    //    actionIndex++;
-
-    //    if (actionIndex >= enemyData.Actions.Count)
-    //        actionIndex = 0;
-
-    //    return action;
-    //}
-    // new
     public EnemyAction GetNextAction(
         int playerHP,
         int playerMaxHP,

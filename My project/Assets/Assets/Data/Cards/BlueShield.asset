@@ -18,3 +18,4 @@ MonoBehaviour:
   description: It blocks up to 10 damage
   sprite: {fileID: 3999373412554968695, guid: 66bc59b52c77fb049ba48701f5f22c2c, type: 3}
   effectType: 2
+  cardPrice: 5
