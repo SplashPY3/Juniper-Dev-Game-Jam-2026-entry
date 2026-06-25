@@ -14,11 +14,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Enemy
   enemyName: Ringmaster
   sprite: {fileID: 0}
-  maxHP: 30
+  maxHP: 25
   goldReward: 20
   actionSelectionMode: 2
   enemyDifficulty: 2
   Actions:
+  - intentType: 0
+    value: 5
+    description: 
+  - intentType: 0
+    value: 5
+    description: 
+  - intentType: 0
+    value: 5
+    description: 
   - intentType: 0
     value: 5
     description: 

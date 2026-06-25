@@ -10,10 +10,16 @@ public class CombatManager : MonoBehaviour
     [SerializeField] private int playerMaxHP = 30;
     [SerializeField] private int playerHP = 30;
     [SerializeField] private int playerBlock = 0;
+    [SerializeField] private int playerDamage = 0;
     [SerializeField] private int playerDamageBonus = 0;
+    [SerializeField] private int playerDamageMultiplier = 1;
     //[SerializeField] private int playerGold = 0;
     [SerializeField] private bool alreadySpun = false;
     [SerializeField] private bool cardPlayed = false;
+
+    [Header("Pity Move")]
+    [SerializeField] private int pityDamage = 2;
+    [SerializeField] private int pityBlock = 2;
 
     private bool playerHealedThisTurn;
 
@@ -50,7 +56,7 @@ public class CombatManager : MonoBehaviour
 
     [SerializeField] private EnemyController enemyController;
 
-    [SerializeField] private PlayerManager playerManager;
+    //[SerializeField] private PlayerManager playerManager;
 
     private Card.CardColor spunColor;
 
@@ -72,6 +78,7 @@ public class CombatManager : MonoBehaviour
         victoryPanel.SetActive(false); // disable the UI before starting the game
         defeatPanel.SetActive(false);
 
+        enemyController.Initialize(RunManager.Instance.selectedEnemy);
         EnterCombat();
         UpdateHealthUI();
     }
@@ -123,6 +130,19 @@ public class CombatManager : MonoBehaviour
         }
     }
 
+    private bool HasPlayableCards()
+    {
+        foreach (CardButton card in cards)
+        {
+            if (card != null && card.Data != null && card.Data.color == spunColor)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     void ResetPlayableCards()
     {
         deckManager.ClearSelection();
@@ -131,6 +151,16 @@ public class CombatManager : MonoBehaviour
         {
             card?.ShowNeutral();
         }
+    }
+
+    private void ShowIncomingPlayerDamage(int damage)
+    {
+        playerHealthTakenText.text = $"-{damage}";
+    }
+
+    private void ShowIncomingEnemyDamage(int damage)
+    {
+        enemyHealthTakenText.text = $"-{damage}";
     }
 
     public void TryDrawOneCard()
@@ -179,9 +209,19 @@ public class CombatManager : MonoBehaviour
         switch (card.effectType)
         {
             case CardEffectType.Damage:
-                int damage = card.effectValue + playerDamageBonus;
-                enemyHealthTakenText.text = $"-{damage}";
-                StartCoroutine(DamageEnemyAfterDelay(damage));
+                int baseDamage = card.effectValue + playerDamageBonus;
+                int damage = baseDamage * playerDamageMultiplier;
+
+                playerDamage = damage;
+
+                ShowIncomingEnemyDamage(playerDamage); // damage
+                StartCoroutine(DamageEnemyAfterDelay(playerDamage)); // damage
+
+                playerDamageMultiplier = 1;
+                playerBuffAddedText.text = playerDamageBonus > 0
+                    ? $"+{playerDamageBonus}"
+                    : "";
+
                 break;
 
             case CardEffectType.Heal:
@@ -197,6 +237,13 @@ public class CombatManager : MonoBehaviour
                 break;
 
             case CardEffectType.Buff:
+                if (card.cardName.Equals("Yellow Double Attack"))
+                {
+                    playerDamageMultiplier = card.effectValue;
+                    playerBuffAddedText.text = $"x{playerDamageMultiplier}";
+                    break;
+                }
+
                 playerDamageBonus += card.effectValue;
                 playerBuffAddedText.text = $"+{playerDamageBonus}";
                 break;
@@ -272,8 +319,7 @@ public class CombatManager : MonoBehaviour
         int blockedDamage = Mathf.Min(playerBlock, totalDamage);
         int remainingDamage = totalDamage - blockedDamage;
 
-        if (remainingDamage > 0)
-            playerHealthTakenText.text = $"-{remainingDamage}";
+        ShowIncomingPlayerDamage(totalDamage);
 
         yield return new WaitForSeconds(1f);
 
@@ -291,7 +337,7 @@ public class CombatManager : MonoBehaviour
 
     private IEnumerator ResolveEnemyBlock(int amount)
     {
-        enemyShieldAddedText.text = $"+{amount} Block";
+        enemyShieldAddedText.text = $"+{amount}";
         yield return new WaitForSeconds(1f);
 
         enemyController.AddBlock(amount);
@@ -313,7 +359,7 @@ public class CombatManager : MonoBehaviour
         yield return new WaitForSeconds(1f);
 
         enemyController.DoubleAttackDamage();
-        enemyBuffAddedText.text = "";
+        //enemyBuffAddedText.text = "";
     }
 
     private IEnumerator ResolveEnemyDebuff()
@@ -322,7 +368,7 @@ public class CombatManager : MonoBehaviour
         int reducedBonus = previousBonus / 2;
         int removedBonus = previousBonus - reducedBonus;
 
-        playerBuffAddedText.text = $"-{removedBonus} Buff";
+        playerBuffAddedText.text = $"-{removedBonus}";
         yield return new WaitForSeconds(1f);
 
         playerDamageBonus = reducedBonus;
@@ -340,6 +386,7 @@ public class CombatManager : MonoBehaviour
         if (enemyController.isDead())
         {
             WinCombat();
+            RunManager.Instance.AddDefeated(enemyController.GetEnemy());
             return true;
         }
 
@@ -375,6 +422,22 @@ public class CombatManager : MonoBehaviour
         playerHealthAddedText.text = "";
     }
 
+    private void PityResolve()
+    {
+        bool heads = Random.value < 0.5f;
+
+        if (heads)
+        {
+            ShowIncomingEnemyDamage(pityDamage);
+            StartCoroutine(DamageEnemyAfterDelay(pityDamage));
+            return;
+        }
+
+        playerBlock += pityBlock;
+        playerShieldAddedText.text = $"+{playerBlock}";
+        UpdateHealthUI();
+    }
+
     private void WinCombat()
     {
         currentState = CombatState.Won;
@@ -386,8 +449,8 @@ public class CombatManager : MonoBehaviour
     {
         //playerGold += enemyController.GoldReward;
         goldAddedText.text = $"+{enemyController.GoldReward} gold";
-        playerManager.AddGold(enemyController.GoldReward);
-        currentGoldText.text = $"Current gold: {playerManager.Gold}";
+        PlayerManager.Instance.AddGold(enemyController.GoldReward);
+        currentGoldText.text = $"Current gold: {PlayerManager.Instance.Gold}";
     }
 
     private void LoseCombat()
@@ -402,6 +465,11 @@ public class CombatManager : MonoBehaviour
         if (currentState != CombatState.PlayerTurnSpun)
         {
             return;
+        }
+
+        if (!cardPlayed && !HasPlayableCards())
+        {
+            PityResolve();
         }
 
         ResetPlayableCards();

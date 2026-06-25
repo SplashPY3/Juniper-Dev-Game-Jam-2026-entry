@@ -18,7 +18,7 @@ public class EnemyController : MonoBehaviour
         Initialize(enemyData);
     }
 
-    private void Initialize(Enemy data)
+    public void Initialize(Enemy data)
     {
         enemyData = data;
 
@@ -68,31 +68,31 @@ public class EnemyController : MonoBehaviour
             : 0f;
 
         // A vulnerable player should always be pressured with an attack.
-        if (playerHPPercent < 0.35f)
-        {
-            EnemyAction attack = GetRandomActionOfType(IntentType.Attack);
+        //if (playerHPPercent < 0.35f)
+        //{
+        //    EnemyAction attack = GetRandomActionOfType(IntentType.Attack);
 
-            if (attack == null)
-                Debug.LogWarning($"{enemyData.enemyName} needs an Attack action for its low-health reaction.");
+        //    if (attack == null)
+        //        Debug.LogWarning($"{enemyData.enemyName} needs an Attack action for its low-health reaction.");
 
-            return attack;
-        }
+        //    return attack;
+        //}
 
         // React to healing by either doubling future attack damage or halving the player's buff.
-        if (playerHealedThisTurn)
-        {
-            EnemyAction healReaction = ChooseRandomAction(IntentType.Buff, IntentType.Debuff);
-            if (healReaction != null)
-                return healReaction;
-        }
+        //if (playerHealedThisTurn)
+        //{
+        //    EnemyAction healReaction = ChooseRandomAction(IntentType.Buff, IntentType.Debuff);
+        //    if (healReaction != null)
+        //        return healReaction;
+        //}
 
         // Counter an active player buff with block or a debuff.
-        if (playerDamageBonus > 0)
-        {
-            EnemyAction buffReaction = ChooseRandomAction(IntentType.Block, IntentType.Debuff);
-            if (buffReaction != null)
-                return buffReaction;
-        }
+        //if (playerDamageBonus > 0)
+        //{
+        //    EnemyAction buffReaction = ChooseRandomAction(IntentType.Block, IntentType.Debuff);
+        //    if (buffReaction != null)
+        //        return buffReaction;
+        //}
 
         float enemyHPPercent = MaxHP > 0
             ? (float)CurrentHP / MaxHP
@@ -233,5 +233,10 @@ public class EnemyController : MonoBehaviour
     public bool isDead()
     {
         return CurrentHP <= 0;
+    }
+
+    public Enemy GetEnemy()
+    {
+        return enemyData;
     }
 }

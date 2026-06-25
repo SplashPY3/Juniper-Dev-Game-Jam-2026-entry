@@ -1513,6 +1513,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 15e365c7658b7d94f86fb6fd2a97b285, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerManager
+  playerDeck: []
 --- !u!4 &436836669
 Transform:
   m_ObjectHideFlags: 0
@@ -2133,9 +2134,13 @@ MonoBehaviour:
   playerMaxHP: 30
   playerHP: 30
   playerBlock: 0
+  playerDamage: 0
   playerDamageBonus: 0
+  playerDamageMultiplier: 1
   alreadySpun: 0
   cardPlayed: 0
+  pityDamage: 2
+  pityBlock: 2
   playerHealthText: {fileID: 314388851}
   goldAddedText: {fileID: 2145278546}
   currentGoldText: {fileID: 1007372188}
@@ -5400,6 +5405,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: f8f4d6268093ab44e95810322c5bd76a, type: 2}
   - {fileID: 11400000, guid: b5309108f738d07489578f4acb854329, type: 2}
   - {fileID: 11400000, guid: 7e6ef19a7f0dcbc42b53836e553e3105, type: 2}
+  - {fileID: 11400000, guid: 2fc21446134be5842a991633a57244e8, type: 2}
+  - {fileID: 11400000, guid: 889870bef80aa474ab285c0988d15dff, type: 2}
   handSlots:
   - {fileID: 298069889}
   - {fileID: 2117964826}

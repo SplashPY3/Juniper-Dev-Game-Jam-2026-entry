@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class ShopManager : MonoBehaviour
 {
@@ -45,5 +46,10 @@ public class ShopManager : MonoBehaviour
     public void UpdateGoldUI()
     {
         playerGoldText.text = $"Current gold: {PlayerManager.Instance.Gold}";
+    }
+
+    public void NextRound()
+    {
+        SceneManager.LoadScene("EnemySelection");
     }
 }

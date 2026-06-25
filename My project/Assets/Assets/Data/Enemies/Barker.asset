@@ -23,5 +23,8 @@ MonoBehaviour:
     value: 2
     description: Light Attack
   - intentType: 0
-    value: 4
+    value: 5
     description: Attack x2
+  - intentType: 1
+    value: 5
+    description: Block damage

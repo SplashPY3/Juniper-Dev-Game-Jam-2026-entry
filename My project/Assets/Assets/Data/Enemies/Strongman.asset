@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Enemy
   enemyName: Strongman
   sprite: {fileID: 0}
-  maxHP: 5
-  goldReward: 25
+  maxHP: 20
+  goldReward: 5
   actionSelectionMode: 0
   enemyDifficulty: 0
   Actions:
