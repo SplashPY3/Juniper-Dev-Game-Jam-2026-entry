@@ -21,6 +21,13 @@ public class RunManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
+    public void StartNewRun()
+    {
+        selectedEnemy = null;
+
+        defeatedEnemies.Clear();
+    }
+
     public void SelectEnemy(Enemy enemy)
     {
         selectedEnemy = enemy;

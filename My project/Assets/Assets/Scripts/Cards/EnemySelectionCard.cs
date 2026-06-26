@@ -72,4 +72,9 @@ public class EnemySelectionCard : MonoBehaviour
         }
 
     }
+
+    public bool IsDefeated()
+    {
+        return enemy != null && RunManager.Instance.HasDefeated(enemy);
+    }
 }

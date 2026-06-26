@@ -20,11 +20,11 @@ MonoBehaviour:
   enemyDifficulty: 0
   Actions:
   - intentType: 0
-    value: 5
+    value: 3
     description: Attack
   - intentType: 0
-    value: 5
+    value: 3
     description: Attack
   - intentType: 0
-    value: 10
+    value: 6
     description: Heavy Attack

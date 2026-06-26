@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dcdda531e6feb3b4c9288e1bfb68c8b7, type: 3}
   m_Name: YellowBuff
   m_EditorClassIdentifier: Assembly-CSharp::Card
-  cardName: Yellow Buff
+  cardName: Added Damage
   color: 3
   effectValue: 2
-  description: This card buffs you with 15 points
+  description: +2 damage
   sprite: {fileID: 999996611833419815, guid: 794187ad4b9a1e549ab7d6597446c2f6, type: 3}
   effectType: 3
   cardPrice: 5

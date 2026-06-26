@@ -107,12 +107,12 @@ public class EnemyController : MonoBehaviour
         }
 
         // Player has block? Buff instead of wasting attack.
-        if (playerBlock > 0)
-        {
-            EnemyAction defensiveAction = ChooseRandomAction(IntentType.Buff, IntentType.Block);
-            if (defensiveAction != null)
-                return defensiveAction;
-        }
+        //if (playerBlock > 0)
+        //{
+        //    EnemyAction defensiveAction = ChooseRandomAction(IntentType.Buff, IntentType.Block);
+        //    if (defensiveAction != null)
+        //        return defensiveAction;
+        //}
 
         // Otherwise, pick randomly from available actions.
         return GetRandomAction();

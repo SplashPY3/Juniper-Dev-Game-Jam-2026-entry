@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dcdda531e6feb3b4c9288e1bfb68c8b7, type: 3}
   m_Name: RedStrike
   m_EditorClassIdentifier: Assembly-CSharp::Card
-  cardName: Red Strike
+  cardName: Strike
   color: 0
   effectValue: 5
-  description: This card damages the enemy
+  description: Deal 5 damage
   sprite: {fileID: -8911045015832400989, guid: 94e997ea439991c48a3f7baec6ca607a, type: 3}
   effectType: 0
   cardPrice: 5

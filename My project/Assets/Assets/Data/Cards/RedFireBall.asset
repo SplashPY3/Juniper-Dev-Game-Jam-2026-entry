@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dcdda531e6feb3b4c9288e1bfb68c8b7, type: 3}
   m_Name: RedFireBall
   m_EditorClassIdentifier: Assembly-CSharp::Card
-  cardName: Red Fire ball
+  cardName: Flames
   color: 0
   effectValue: 5
-  description: This card sets the enemy ablaze
+  description: Deal 5 damage
   sprite: {fileID: 6682239313113947837, guid: 7b1cee321bdb4674d926d0fb3fa66901, type: 3}
   effectType: 0
   cardPrice: 7

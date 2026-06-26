@@ -9,6 +9,9 @@ public class PlayerManager : MonoBehaviour
 
     public List<Card> playerDeck = new();
 
+    [SerializeField] List<Card> startingDeck = new();
+    [SerializeField] private int startingGold = 10;
+
     private void Awake()
     {
         if (Instance != null)
@@ -19,6 +22,14 @@ public class PlayerManager : MonoBehaviour
 
         Instance = this;
         DontDestroyOnLoad(gameObject);
+    }
+
+    public void StartNewRun()
+    {
+        Gold = startingGold;
+
+        playerDeck.Clear();
+        playerDeck.AddRange(startingDeck);
     }
 
     public void AddGold(int amount)

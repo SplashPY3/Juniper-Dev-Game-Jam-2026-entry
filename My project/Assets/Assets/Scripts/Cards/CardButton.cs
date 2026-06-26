@@ -1,41 +1,83 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
-public class CardButton : MonoBehaviour
+public class CardButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     [SerializeField] private Card card;
     [SerializeField] private CombatManager combatManager;
     [SerializeField] private DeckManager deckManager;
     [SerializeField] private Image cardImage;
+    [SerializeField] private TMP_Text cardNameText;
+    [SerializeField] private TMP_Text cardDescriptionText;
 
     [SerializeField] private GameObject playCardButton;
 
     private Button button;
     private HandSelectionManager selectionManager;
+    private bool isSelected;
 
     public Card Data => card;
 
     private void Awake()
     {
         button = GetComponent<Button>();
-        button.transition = Selectable.Transition.None;
+
+        if (button != null)
+            button.transition = Selectable.Transition.None;
+
     }
 
     private void Start()
     {
         SetSelected(false);
+        SetCardInfo();
+        ShowCardInfo(false);
+    }
+
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        ShowCardInfo(card != null && !isSelected);
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        ShowCardInfo(false);
+    }
+
+    private void ShowCardInfo(bool show)
+    {
+        if (cardNameText != null) // check if card is selected
+            cardNameText.gameObject.SetActive(show);
+
+        if (cardDescriptionText != null)
+            cardDescriptionText.gameObject.SetActive(show);
+    }
+
+    private void SetCardInfo()
+    {
+        if (cardNameText != null)
+            cardNameText.text = card != null ? card.cardName : "";
+
+        if (cardDescriptionText != null)
+            cardDescriptionText.text = card != null ? card.description : "";
     }
 
     public void SetPlayable(bool playable)
     {
-        button.interactable = playable && card != null;
+        if (button != null)
+            button.interactable = playable && card != null;
 
         if (card == null)
             return;
 
-        cardImage.color = playable
-            ? Color.white
-            : Color.gray;
+        if (cardImage != null)
+        {
+            cardImage.color = playable
+                ? Color.white
+                : Color.gray;
+        }
     }
 
     public void SetCard(Card newCard)
@@ -44,22 +86,33 @@ public class CardButton : MonoBehaviour
 
         if (card == null )
         {
-            cardImage.enabled = false;
-            button.interactable = false;
+            if (cardImage != null)
+                cardImage.enabled = false;
+
+            if (button != null)
+                button.interactable = false;
+
+            SetCardInfo();
             return;
         }
 
-        cardImage.enabled = true;
-        cardImage.sprite = card.sprite;
+        if (cardImage != null)
+        {
+            cardImage.enabled = true;
+            cardImage.sprite = card.sprite;
+        }
+
+        SetCardInfo();
 
         ShowNeutral();
     }
 
     public void ShowNeutral()
     {
-        button.interactable = false;
+        if (button != null)
+            button.interactable = false;
 
-        if (card != null)
+        if (card != null && cardImage != null)
         {
             cardImage.color = Color.white;
         }
@@ -85,11 +138,17 @@ public class CardButton : MonoBehaviour
 
     public void SetSelected(bool selected)
     {
-        playCardButton.SetActive(selected && card != null);
+        isSelected = selected;
+
+        if (isSelected)
+            ShowCardInfo(false);
+
+        if (playCardButton != null)
+            playCardButton.SetActive(selected && card != null);
     }
 
     public void PlayCard()
     {
-        combatManager.PlayCard(this);
+        combatManager?.PlayCard(this);
     }
 }

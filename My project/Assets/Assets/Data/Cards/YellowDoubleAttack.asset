@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dcdda531e6feb3b4c9288e1bfb68c8b7, type: 3}
   m_Name: YellowDoubleAttack
   m_EditorClassIdentifier: Assembly-CSharp::Card
-  cardName: Yellow Double Attack
+  cardName: Damage Multiplier
   color: 3
   effectValue: 2
-  description: Doubles your attack damage
+  description: x2 damage
   sprite: {fileID: 5681004649603926265, guid: 6dc14d11fc9db284bb0f68aeb6d72681, type: 3}
   effectType: 3
   cardPrice: 7

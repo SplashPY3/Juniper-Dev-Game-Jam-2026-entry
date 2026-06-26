@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dcdda531e6feb3b4c9288e1bfb68c8b7, type: 3}
   m_Name: RedHeavyStrike
   m_EditorClassIdentifier: Assembly-CSharp::Card
-  cardName: Red Heavy Strike
+  cardName: Heavy Strike
   color: 0
   effectValue: 7
-  description: This card damages the enemy. 1/3 chance of player bleeding
+  description: Deal 7 damage
   sprite: {fileID: 3328710096570947056, guid: 1146bc2860e67f84e9663dbfebdfc41c, type: 3}
   effectType: 0
   cardPrice: 7

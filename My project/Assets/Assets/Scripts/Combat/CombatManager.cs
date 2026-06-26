@@ -237,7 +237,7 @@ public class CombatManager : MonoBehaviour
                 break;
 
             case CardEffectType.Buff:
-                if (card.cardName.Equals("Yellow Double Attack"))
+                if (card.cardName.Equals("Damage Multiplier"))
                 {
                     playerDamageMultiplier = card.effectValue;
                     playerBuffAddedText.text = $"x{playerDamageMultiplier}";
@@ -503,9 +503,16 @@ public class CombatManager : MonoBehaviour
 
     IEnumerator LoadShopAfterDelay(float delay)
     {
-        yield return new WaitForSeconds(3f);
+        yield return new WaitForSeconds(delay);
 
         SceneManager.LoadScene("Shop");
+    }
+
+    IEnumerator LoadMainMenuAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+
+        SceneManager.LoadScene("MainMenu");
     }
 
     void ShowVictory()
@@ -517,5 +524,6 @@ public class CombatManager : MonoBehaviour
     void ShowDefeat()
     {
         defeatPanel.SetActive(true);
+        StartCoroutine(LoadMainMenuAfterDelay(3f));
     }
 }

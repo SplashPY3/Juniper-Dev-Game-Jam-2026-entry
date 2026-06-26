@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dcdda531e6feb3b4c9288e1bfb68c8b7, type: 3}
   m_Name: GreenHeal
   m_EditorClassIdentifier: Assembly-CSharp::Card
-  cardName: Green Heal
+  cardName: Heal
   color: 1
   effectValue: 5
-  description: This card heals you
+  description: Restore 5 health
   sprite: {fileID: 9210035820783190459, guid: fef1ef01b869c62499df2cc1adc7c351, type: 3}
   effectType: 1
   cardPrice: 5

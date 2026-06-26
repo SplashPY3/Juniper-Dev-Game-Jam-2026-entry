@@ -21,4 +21,9 @@ public class HandSelectionManager
         selectedCard?.SetSelected(false);
         selectedCard = null;
     }
+
+    public CardButton GetSelected()
+    {
+        return selectedCard;
+    }
 }

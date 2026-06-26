@@ -20,11 +20,11 @@ MonoBehaviour:
   enemyDifficulty: 1
   Actions:
   - intentType: 0
-    value: 2
+    value: 4
     description: Light Attack
   - intentType: 0
-    value: 5
+    value: 8
     description: Attack x2
   - intentType: 1
-    value: 5
+    value: 4
     description: Block damage

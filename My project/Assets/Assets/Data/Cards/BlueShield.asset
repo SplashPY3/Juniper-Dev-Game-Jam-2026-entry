@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dcdda531e6feb3b4c9288e1bfb68c8b7, type: 3}
   m_Name: BlueShield
   m_EditorClassIdentifier: Assembly-CSharp::Card
-  cardName: Blue Shield
+  cardName: Shield
   color: 2
   effectValue: 5
-  description: It blocks up to 10 damage
+  description: Block 5 damage
   sprite: {fileID: 3999373412554968695, guid: 66bc59b52c77fb049ba48701f5f22c2c, type: 3}
   effectType: 2
   cardPrice: 5
