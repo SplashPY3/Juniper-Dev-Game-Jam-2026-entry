@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using TMPro;
 using UnityEngine;
@@ -59,6 +60,15 @@ public class CombatManager : MonoBehaviour
     //[SerializeField] private PlayerManager playerManager;
 
     private Card.CardColor spunColor;
+    private WedgeType spunWedge; // raw WheelManager result, drives Wild/Gold logic
+
+    [SerializeField] private int energy = 0;
+
+    public static CombatManager Instance { get; private set; }
+
+    // Events for the relic system
+    public static event Action OnPlayerTurnStart;
+    public static event Action OnEnemyKilled;
 
     private enum CombatState
     {
@@ -71,6 +81,11 @@ public class CombatManager : MonoBehaviour
     }
 
     private CombatState currentState = CombatState.NotStarted;
+
+    private void Awake()
+    {
+        Instance = this;
+    }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -94,6 +109,7 @@ public class CombatManager : MonoBehaviour
         drawCardButton.interactable = false;
         ResetPlayableCards();
         UpdateTurnUI();
+        OnPlayerTurnStart?.Invoke();
     }
 
     void StartEnemyTurn()
@@ -114,24 +130,67 @@ public class CombatManager : MonoBehaviour
 
         currentState = CombatState.PlayerTurnSpun;
 
-        spunColor = (Card.CardColor)Random.Range(0, 4);
+        spunColor = (Card.CardColor)Random.Range(0, 4); // default fallback
+
+        if (WheelManager.Instance != null)
+        {
+            spunWedge = WheelManager.Instance.Spin();
+
+            // Map wedge to card color for existing card-matching logic
+            switch (spunWedge)
+            {
+                case WedgeType.Red:    spunColor = Card.CardColor.Red;    break;
+                case WedgeType.Green:  spunColor = Card.CardColor.Green;  break;
+                case WedgeType.Blue:   spunColor = Card.CardColor.Blue;   break;
+                case WedgeType.Yellow: spunColor = Card.CardColor.Yellow; break;
+                default: break; // Wild/Gold handled in UpdatePlayableCards
+            }
+        }
+        else
+        {
+            spunWedge = (WedgeType)(int)spunColor;
+        }
 
         UpdatePlayableCards();
 
     }
     private void UpdatePlayableCards()
     {
-        wheelRenderer.color = Card.GetDisplayColor(spunColor);
+        // Set wheel renderer color
+        if (spunWedge == WedgeType.Wild)
+            wheelRenderer.color = Color.white;
+        else if (spunWedge == WedgeType.Gold)
+            wheelRenderer.color = new Color(1f, 0.8f, 0f);
+        else
+            wheelRenderer.color = Card.GetDisplayColor(spunColor);
 
         foreach (CardButton card in cards)
         {
-            bool playable = card != null && card.Data != null && card.Data.color == spunColor;
+            bool playable;
+
+            if (spunWedge == WedgeType.Wild)
+                playable = card != null && card.Data != null; // Wild: all cards playable
+            else if (spunWedge == WedgeType.Gold)
+                playable = false; // Gold: no card play this turn
+            else
+                playable = card != null && card.Data != null && card.Data.color == spunColor;
+
             card?.SetPlayable(playable);
+        }
+
+        // Gold spin ends the player turn automatically
+        if (spunWedge == WedgeType.Gold)
+        {
+            Debug.Log("[CombatManager] Gold spin! (Reward TBD)");
+            Invoke(nameof(EndPlayerTurn), 1f);
         }
     }
 
     private bool HasPlayableCards()
     {
+        if (spunWedge == WedgeType.Wild) return true;
+        if (spunWedge == WedgeType.Gold) return false;
+
         foreach (CardButton card in cards)
         {
             if (card != null && card.Data != null && card.Data.color == spunColor)
@@ -187,7 +246,7 @@ public class CombatManager : MonoBehaviour
         if (cardPlayed)
             return false;
 
-        if (card.Data.color != spunColor)
+        if (spunWedge != WedgeType.Wild && card.Data.color != spunColor)
             return false;
 
         cardPlayed = true;
@@ -441,6 +500,7 @@ public class CombatManager : MonoBehaviour
     private void WinCombat()
     {
         currentState = CombatState.Won;
+        OnEnemyKilled?.Invoke();
         RewardPlayer();
         ShowVictory();
     }
@@ -518,4 +578,11 @@ public class CombatManager : MonoBehaviour
     {
         defeatPanel.SetActive(true);
     }
+
+    public void GainEnergy(int amount)
+    {
+        energy += amount;
+        Debug.Log($"[CombatManager] Energy: {energy}");
+    }
 }
+
