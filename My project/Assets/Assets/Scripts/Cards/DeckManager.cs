@@ -39,7 +39,15 @@ public class DeckManager : MonoBehaviour
         hand.Clear();
         discardPile.Clear();
 
-        drawPile.AddRange(startingDeck);
+        if (PlayerManager.Instance != null && PlayerManager.Instance.PlayerDeck.Count > 0)
+        {
+            drawPile.AddRange(PlayerManager.Instance.PlayerDeck);
+        }
+        else
+        {
+            drawPile.AddRange(startingDeck);
+        }
+
         Shuffle(drawPile);
     }
 

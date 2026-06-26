@@ -35,6 +35,9 @@ public class ShopCardSlot : MonoBehaviour
 
     public void BuyCard()
     {
+        if (card == null || PlayerManager.Instance == null)
+            return;
+
         if (!PlayerManager.Instance.SpendGold(card.cardPrice))
         {
             Debug.Log("Not enough gold.");

@@ -7,10 +7,12 @@ public class PlayerManager : MonoBehaviour
 
     public int Gold { get; private set; }
 
-    public List<Card> playerDeck = new();
+    [SerializeField] private List<Card> playerDeck = new();
 
     [SerializeField] List<Card> startingDeck = new();
     [SerializeField] private int startingGold = 10;
+
+    public IReadOnlyList<Card> PlayerDeck => playerDeck;
 
     private void Awake()
     {
@@ -54,6 +56,9 @@ public class PlayerManager : MonoBehaviour
 
     public void AddCardToDeck(Card card)
     {
+        if (card == null)
+            return;
+
         playerDeck.Add(card);
     }
 }
